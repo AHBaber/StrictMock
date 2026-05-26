@@ -1,0 +1,17 @@
+skip = {
+    "__class__",
+    "__del__",
+    "__dict__",
+    "__getattr__",
+    "__getattribute__",
+    "__init__",
+    "__init_subclass__",
+    "__instancecheck__",
+    "__new__",
+    "__prepare__",
+    "__reduce__",
+    "__setattr__",
+    "__subclasscheck__",
+    "__subclasshook__",
+    "__weakref__",
+}

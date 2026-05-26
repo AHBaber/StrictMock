@@ -1,0 +1,2 @@
+[pytest11]
+strict-mock = strict_mock.plugin

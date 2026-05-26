@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools >= 80.9.0"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "StrictMock"
+version = "0.5.0"
+description = "Highly Deterministic Mocking"
+license = { file = "LICENSE" }
+readme = "README.md"
+keywords = ["mock", "unittest"]
+dependencies = [
+    "pytest"
+]
+
+[project.optional-dependencies]
+testing = [
+    "pytest"
+]
+
+[project.entry-points."pytest11"]
+strict-mock = "strict_mock.plugin"
+
+[tool.mypy]
+check_untyped_defs = true
+
+[tool.coverage.run]
+omit = ["strict_mock/plugin.py"]
