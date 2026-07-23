@@ -2,9 +2,9 @@ from typing import List, Optional
 
 import pytest
 
-from strict_mock import (Actual, DefaultFormatter, Expected, IReportFormatter,
-                         TypeData)
-from strict_mock.analysis import CheckType, Param, ParamList
+from strict_mock.analysis import (Actual, CheckType, ErrorExpected, Expected,
+                                  Param, ParamList, TypeData)
+from strict_mock.implementations import DefaultFormatter, IReportFormatter
 
 
 class Dummy(IReportFormatter):
@@ -123,4 +123,29 @@ def test_default_formatter_report_1_row_mismatch_returns_expected():
         td.as_fix_method()
     formatter = DefaultFormatter()
     actual = formatter.report("1Row", e, a, [td])
+    assert actual == expected, f"\nexpected: '{expected}'\nactual  : '{actual}'"
+
+
+def test_default_formatter_report_error_expected_returns_expected():
+    expected = (
+        'StrictMock: ErrorExpectedReport Discrepancies\n'
+        'Data Length\n'
+        '    expected: 1\n'
+        '    actual  : 1\n'
+        'Error          0: Error in Expected: Something went wrong\n'
+        '                      fix: hopefully something useful\n'
+        'Error          0: Actual("method1")\n\n'
+    )
+    e: List[Expected] = [
+        ErrorExpected("Something went wrong", "hopefully something useful"),
+    ]
+    a: List[Actual] = [
+        Actual("method1"),
+    ]
+    pl = ParamList([Param("self"), Param("i", int), Param("j", int)])
+    td = TypeData("method1", CheckType(), pl)
+    if td.check_types(5, 7):
+        td.as_fix_method()
+    formatter = DefaultFormatter()
+    actual = formatter.report("ErrorExpectedReport", e, a, [td])
     assert actual == expected, f"\nexpected: '{expected}'\nactual  : '{actual}'"

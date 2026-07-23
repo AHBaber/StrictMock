@@ -2,6 +2,7 @@ from enum import Enum
 from typing import Any, Optional
 
 from .actual import Actual
+from .errors import MockCreationError
 from .utility import TypeIgnore, ValueIgnore, stringify
 
 
@@ -13,7 +14,7 @@ class _ReturnType(Enum):
 
 
 class Expected(Actual):
-    """Declares a single expected call on a mock, including its arguments and optional return behaviour.
+    """Declares a single expected call on a mock, including its arguments and optional return behavior.
 
     An ``Expected`` is constructed with the method name and the exact arguments
     that must be passed when the mock is called. It can optionally be chained
@@ -30,6 +31,43 @@ class Expected(Actual):
         self._return_value: Any = None
         self._returns_type: _ReturnType = _ReturnType.kNone
         self._error: Optional[Exception] = None
+        self._nomenclature = "Expected"
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Expected):
+            return False
+        if self.name != other.name:
+            return False
+        if len(self.args) != len(other.args):
+            return False
+        if len(self.kwargs) != len(other.kwargs):
+            return False
+        for i in range(len(self.args)):
+            if self.args[i] is ValueIgnore or other.args[i] is ValueIgnore:
+                continue
+            if self.args[i] != other.args[i]:
+                return False
+        for k, v in self.kwargs.items():
+            if k not in other.kwargs:
+                return False
+            if v is ValueIgnore or other.kwargs[k] is ValueIgnore:
+                continue
+            if v != other.kwargs[k]:
+                return False
+        if self._returns_type != other._returns_type:
+            return False
+        if self._return_value != other._return_value:
+            return False
+        if self._error is not None:
+            if other._error is None:
+                return False
+            if type(self._error) is not type(other._error):
+                return False
+            if str(self._error) != str(other._error):
+                return False
+        elif other._error is not None:
+            return False
+        return True
 
     def returns_value(self, value: Any) -> "Expected":
         """Set the value to be returned when this expected call is matched.
@@ -100,6 +138,8 @@ class Expected(Actual):
         Returns:
             self, to allow chaining.
         """
+        if self.name != "__next__":
+            raise MockCreationError(f'.stop_iteration() may only be used with "__next__", not "{self.name}"')
         return self.raises_error(StopIteration())
 
     def _get_return_value(self) -> Any:
@@ -140,7 +180,7 @@ class Expected(Actual):
                 return True
         return False
 
-    def report(self) -> str:
+    def report(self, indent: str = "") -> str:
         """Return a string representation of this expected call as valid Python source.
 
         The output includes the call arguments and any chained modifier
@@ -164,7 +204,7 @@ class Expected(Actual):
         if self._error is not None:
             e = str(self._error)
             re = f".raises_error({type(self._error).__name__}({stringify(e)}))"
-        return f"Expected{self.as_str()}" + rv + re
+        return f"{indent}{self._nomenclature}{self.as_str()}" + rv + re
 
     def _report_mock_fix(self, mock_name: str) -> str:
         rv = ""
@@ -172,4 +212,39 @@ class Expected(Actual):
             rv = f'.returns_mock("{mock_name}")'
         elif self._returns_type == _ReturnType.kSelfIgnore:
             rv = f'.returns_mock("{mock_name}", True)'
-        return f"Expected{self.as_str()}" + rv
+        return f"{self._nomenclature}{self.as_str()}" + rv
+
+
+class ErrorExpected(Expected):
+    def __init__(self, name: str, fix: str, expected: Optional[Expected] = None, other: Any = None) -> None:
+        super().__init__(name)
+        self._fix = fix
+        self._expected = expected
+        self._other = other
+
+    def compare_actual(self, actual: Actual) -> bool:
+        """Always report a discrepancy.
+
+        An ErrorExpected stands in for a call that could not be matched, so any
+        actual call compared against it is treated as a mismatch.
+
+        Returns:
+            True, always.
+        """
+        # always an error
+        return True
+
+    def report(self, indent: str = "") -> str:
+        """Render this error as a multi-line fix suggestion.
+
+        Includes the incorrect Expected or actual call when available, followed by
+        the stored fix instruction.
+        """
+        lines = [f"{indent}Error in Expected: {self.name}"]
+        indent = " " * (len(indent) + 4)
+        if self._expected:
+            lines.append(f"{indent}incorrect: {self._expected.report()}")
+        if self._other:
+            lines.append(f"{indent}incorrect: {type(self._other).__name__}: {self._other.location()}")
+        lines.append(f"{indent}fix: {self._fix}")
+        return "\n".join(lines)

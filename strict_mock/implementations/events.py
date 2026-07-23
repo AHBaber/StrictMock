@@ -1,7 +1,8 @@
 from typing import Any, Dict, List, NoReturn, Optional, Type
 
-from strict_mock.analysis import (Actual, Expected, MockCreationError,
-                                  MockError, TypeData, TypeIgnore)
+from strict_mock.analysis import (Actual, ErrorExpected, Expected,
+                                  MockCreationError, MockError, TypeData,
+                                  TypeIgnore)
 from strict_mock.implementations.formatter import (DefaultFormatter,
                                                    IReportFormatter)
 
@@ -18,8 +19,7 @@ class Events:
     mock names must be unique within that instance.
 
     Args:
-        expected: Initial list of ``Expected`` entries. May be extended later via
-            ``extend_expected``.
+        expected: Initial list of ``Expected`` entries.
         formatter: Custom formatter for discrepancy reports. Defaults to
             ``DefaultFormatter``.
     """
@@ -111,6 +111,12 @@ class Events:
         index = len(self._actual) - 1
         if index < len(self._expected):
             e = self._expected[index]
+            if type(e) is not Expected:
+                message = f"{type(e).__name__} where Expected was required"
+                fix = "Expected(...)"
+                self._expected[index] = ErrorExpected(message, fix, None, e)
+                self._report_errors(mock)
+
             has_errors = e.compare_actual(actual)
             type_data.adjust_params(*e.args, **e.kwargs)  # apply ValueIgnore before checking
             has_errors |= type_data.check_types(*args, **kwargs)
@@ -127,14 +133,6 @@ class Events:
         # no expected
         type_data.as_fix_method()
         self._report_errors(mock)
-
-    def extend_expected(self, expected: List[Expected]) -> None:
-        """Append additional expected entries to the end of the existing sequence.
-
-        Args:
-            expected: The list of ``Expected`` entries to append.
-        """
-        self._expected.extend(expected)
 
     def _has_errors(self) -> bool:
         # if we have the same number of expected and actual

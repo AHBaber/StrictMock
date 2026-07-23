@@ -1,9 +1,20 @@
+from copy import copy, deepcopy
 from typing import Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 import pytest
 
 from strict_mock.analysis.utility import (TypeIgnore, ValueIgnore, stringify,
                                           type_name)
+
+
+def test_value_ignore_copy_returns_self():
+    actual = copy(ValueIgnore)
+    assert actual is ValueIgnore
+
+
+def test_value_ignore_deepcopy_returns_self():
+    actual = deepcopy(ValueIgnore)
+    assert actual is ValueIgnore
 
 
 @pytest.mark.parametrize("input, expected", [

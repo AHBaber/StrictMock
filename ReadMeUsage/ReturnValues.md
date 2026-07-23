@@ -15,7 +15,10 @@ There are 4(5) different patterns of returned values that StrictMock addresses:
 - An Optional type was specified.
 
 Each pattern will have different effects on how StrictMock expects them to be addressed.
-For demonstrations: see [tests/test_example_return_values](../tests/test_example_return_values.py)
+For demonstrations see:
+
+* [UnitTest Example](../tests/test_example_python_unittest/test_example_return_values.py)
+* [PyTest Example](../tests/test_example_pytest/test_example_return_values.py)
 
 Note: all arguments in the Expected() event must match what is actually passed in before a value is returned.
 
@@ -46,7 +49,8 @@ considered a code smell.
 
 ### Examples
 
-[tests/test_example_return_values.py](../tests/test_example_return_values.py)
+* [UnitTest Example](../tests/test_example_python_unittest/test_example_return_values.py)
+* [PyTest Example](../tests/test_example_pytest/test_example_return_values.py)
 
 #### No Return Specified or Any specified
 

@@ -8,7 +8,10 @@ reasons why they probably should not be mocked.
 
 Module Functions may be mocked just like regular functions.
 
-Example: [tests/test_example_module.py](../tests/test_example_module.py)
+Example:
+
+* [UnitTest Example](../tests/test_example_python_unittest/test_example_module.py)
+* [PyTest Example](../tests/test_example_pytest/test_example_module.py)
 
 Note: the args and kwargs for builtin functions may not properly represent the usage. Quite often, they have no typing
 information or don't even list the possible kwargs. In these cases, the lack of type info means the types will be
@@ -28,7 +31,10 @@ In these cases, You will need to look up proper documentation to ensure that fun
 
 Several modules allow a class to be instantiated. For example pathlib.Path() creates a Path object.
 
-Example: [tests/test_example_module.py](../tests/test_example_module.py)
+Example:
+
+* [UnitTest Example](../tests/test_example_python_unittest/test_example_module.py)
+* [PyTest Example](../tests/test_example_pytest/test_example_module.py)
 
 Note: the args and kwargs for module classes may not properly represent the usage. Quite often, they have no typing
 information or don't even list the possible kwargs. In these cases, the lack of type info means the types will be

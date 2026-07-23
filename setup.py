@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="StrictMock",
-    version="0.2.0",
+    version="0.5.1",
     description="Highly Deterministic Mocking",
     license="BSD",
     packages=find_packages(include=["strict_mock", "strict_mock.*"]),  # Specify the package folder

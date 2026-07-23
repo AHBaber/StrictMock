@@ -5,7 +5,8 @@ needs to be done is to set up the Expected events correctly.
 
 ### Examples
 
-[tests/test_example_iterator.py](../tests/test_example_iterator.py)
+* [UnitTest Example](../tests/test_example_python_unittest/test_example_iterator.py)
+* [PyTest Example](../tests/test_example_pytest/test_example_iterator.py)
 
 ### expected_iter()
 
@@ -20,7 +21,6 @@ is the same as
 
 ```
 expected_calls: List[Expected] = [
-    Expected("__iter__"),
     Expected("__next__").returns_value(1),
     Expected("__next__").returns_value(2),
     Expected("__next__").returns_value(3),
@@ -28,14 +28,5 @@ expected_calls: List[Expected] = [
 ]
 ```
 
-Note if the iterator is being passed into a comprehensions, an additional call to "__iter__" is performed. Thus, to use
-expected_iter(), you need to set up the expected calls like this:
-
-```
-expected_calls: List[Expected] = [Expected("__iter__")] + expected_iter([1, 2, 3])
-```
-
-In other cases, "__iter__" may not be called at all. In that case we may need to slice the array to get the proper
-Expected events.
-
-Ultimately, running the test will tell you if you need to add an __iter__, or remove it.
+Note: ```__iter``` is handled transparently, and simply returns the StrictMock itself. As such, it does not need to be
+included in the expected calls list.

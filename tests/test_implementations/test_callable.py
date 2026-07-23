@@ -1,3 +1,4 @@
+import inspect
 from typing import Any, Callable, List, Type, Union
 
 import pytest
@@ -6,19 +7,11 @@ from strict_mock import Events, Expected, MockCallableError
 from strict_mock.implementations import BaseMock, get_call_dunder
 
 
-class CallMock:
-    def __init__(self):
-        self._callable: Any = None
-
-    def __call__(self, *args, **kwargs):
-        return self._callable.call(*args, **kwargs)
-
-
 def _create_mock(spec: Union[Type[Any], Callable], name: str, expected: List[Expected]):
     events = Events(expected)
-    spec_mocked, spec = get_call_dunder({}, spec)  # type: ignore
+    spec_mocked = get_call_dunder({}, spec)  # type: ignore
     bases: List[Type] = [BaseMock]
-    if spec:
+    if inspect.isclass(spec):
         bases.append(spec)  # type: ignore
     mock_type = type(f'StrictMockTesting:{name}', tuple(bases), spec_mocked)
     return mock_type(spec, name, events)

@@ -1,3 +1,5 @@
+from copy import copy
+
 import pytest
 
 from strict_mock import Events, MockCreationError, strict_mock
@@ -19,6 +21,7 @@ def test_strict_mock_is_instance():
         pass
 
     mock = strict_mock(Spec, "DoesNothing", Events([]))
+    assert mock.assert_all_calls()
     assert isinstance(mock, Spec)
 
 
@@ -51,6 +54,7 @@ def test_no_methods_raises_error():
         mock.method_dne()
     actual = str(ex.value)
     assert actual == expected, f"\nexpected: {expected}\nactual  : {actual}"
+    assert mock.assert_all_calls()
 
 
 def test_no_properties_raises_error():
@@ -63,6 +67,7 @@ def test_no_properties_raises_error():
         mock.prop_dne
     actual = str(ex.value)
     assert actual == expected, f"\nexpected: {expected}\nactual  : {actual}"
+    assert mock.assert_all_calls()
 
 
 def test_no_iter_raises_error():
@@ -75,6 +80,7 @@ def test_no_iter_raises_error():
         next(mock)
     actual = str(ex.value)
     assert actual == expected, f"\nexpected: {expected}\nactual  : {actual}"
+    assert mock.assert_all_calls()
 
 
 def test_no_iter_for_raises_error():
@@ -88,6 +94,7 @@ def test_no_iter_for_raises_error():
             pass
     actual = str(ex.value)
     assert actual == expected, f"\nexpected: {expected}\nactual  : {actual}"
+    assert mock.assert_all_calls()
 
 
 def test_no_cm_raises_error():
@@ -101,3 +108,18 @@ def test_no_cm_raises_error():
             pass
     actual = str(ex.value)
     assert actual == expected, f"\nexpected: {expected}\nactual  : {actual}"
+    assert mock.assert_all_calls()
+
+
+def test_unsupported_raises_error():
+    class Unsupported:
+        def __copy__(self):
+            raise NotImplementedError()
+
+    expected = "StrictMock does not support __copy__"
+    mock = strict_mock(Unsupported)
+    with pytest.raises(MockCreationError) as ex:
+        _ = copy(mock)
+    actual = str(ex.value)
+    assert actual == expected, f"\nexpected: {expected}\nactual  : {actual}"
+    assert mock.assert_all_calls()

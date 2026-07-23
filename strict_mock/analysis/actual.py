@@ -17,7 +17,7 @@ class Actual:
         self.kwargs = kwargs  # any kwargs that were passed in
 
     def as_str(self) -> str:
-        """Return the call arguments formatted as a parenthesised parameter string.
+        """Return the call arguments formatted as a parenthesized parameter string.
 
         The result is suitable for embedding inside an ``Expected(...)`` or
         ``Actual(...)`` expression, for example ``("method_name", 1, key="val")``.
@@ -30,13 +30,13 @@ class Actual:
         m = f'("{self.name}"{comma}{params})'
         return m
 
-    def report(self) -> str:
+    def report(self, indent: str = "") -> str:
         """Return a string representation of this actual call as valid Python source.
 
         The output can be pasted directly into a test as a fix suggestion,
         for example ``Actual("method_name", 1, key="val")``.
         """
-        return f"Actual{self.as_str()}"
+        return f"{indent}Actual{self.as_str()}"
 
     def _get_args(self) -> str:
         if not self.args:

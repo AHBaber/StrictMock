@@ -44,28 +44,56 @@ class Properties:
         self._properties: Dict[str, Prop] = {}
 
     def get_properties_with_setters(self) -> Dict[str, Prop]:
+        """Discover the spec's properties and annotated class variables.
+
+        Decorator ``property`` objects contribute a Prop reflecting which of getter,
+        setter, and deleter they define; annotated class variables become Props with
+        getter and setter enabled. The result is cached on the instance.
+
+        Returns:
+            A mapping of property name to its Prop descriptor.
+        """
         properties_info = {}
         for name, obj in inspect.getmembers(self._spec, predicate=inspect.isdatadescriptor):
             if isinstance(obj, property):
                 type_hint = getattr(self._spec, '__annotations__', {}).get(name, Any)
-                properties_info[name] = Prop(
+                prop_type = self._get_prop_type(obj)
+                properties_info[name] = prop_type(
                     name,
                     type_hint,
                     obj.fget is not None,
                     obj.fset is not None,
                     obj.fdel is not None,
                 )
-        for name, prop_type in getattr(self._spec, '__annotations__', {}).items():
+        # handles annotated class variables
+        for name, type_hint in getattr(self._spec, '__annotations__', {}).items():
             properties_info[name] = Prop(
                 name,
-                prop_type,
+                type_hint,
                 True,
                 True,
             )
         self._properties = properties_info
         return properties_info
 
+    def _get_prop_type(self, obj: Any) -> Type[Prop]:
+        return Prop
+
     def add_properties(self, spec_mocked: _dsc, props: Optional[List[Prop]] = None) -> _dsc:
+        """Add mocked properties to ``spec_mocked``.
+
+        Discovers the spec's own properties first, then applies any explicit
+        ``props`` (artificial properties), which replace discovered ones of the same
+        name.
+
+        Args:
+            spec_mocked: The mapping of mocked members being assembled.
+            props: Optional explicit Prop descriptors that override or extend the
+                discovered properties.
+
+        Returns:
+            The updated ``spec_mocked`` mapping.
+        """
         self.get_properties_with_setters()
         if props:
             for prop in props:
@@ -74,7 +102,17 @@ class Properties:
             spec_mocked[name] = self.create_prop(prop)
         return spec_mocked
 
-    def create_prop(self, prop: Prop):
+    def create_prop(self, prop: Prop) -> Any:
+        """Build a ``property`` object wiring up the prop's enabled accessors.
+
+        Args:
+            prop: The descriptor whose getter, setter, and deleter flags determine
+                which accessors are created.
+
+        Returns:
+            A ``property`` whose accessors record getter, setter, and deleter calls
+            as expected events.
+        """
         g = self._create_getter(prop)
         s = self._create_setter(prop)
         d = self._create_deleter(prop)

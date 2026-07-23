@@ -7,7 +7,7 @@ from strict_mock.implementations import (BaseMock, Classes, Events, Methods,
                                          Prop, Properties, cm_dunders,
                                          container_dunders, default_dunders,
                                          get_call_dunder, get_spec_dict,
-                                         iter_dunders)
+                                         get_unsupported_dunders, iter_dunders)
 from strict_mock.implementations.registry import MockData, register_mock
 
 
@@ -52,7 +52,7 @@ def strict_mock(spec: Union[Type[Any], Callable, ModuleType],
                 name: Optional[str] = None,
                 events: Optional[Events] = None,
                 properties: Optional[List[Prop]] = None,
-                imported: Optional[ImportedTypes] = None):
+                imported: Optional[ImportedTypes] = None) -> BaseMock:
     """Create a strict mock object based on the given spec.
 
     Args:
@@ -79,7 +79,7 @@ def strict_mock(spec: Union[Type[Any], Callable, ModuleType],
     events = events or Events()
     spec_mocked: Dict[str, Callable] = {}
     spec_dict = get_spec_dict(spec)
-    spec_mocked, _ = get_call_dunder(spec_mocked, spec)  # type: ignore
+    spec_mocked = get_call_dunder(spec_mocked, spec)
     if imported is None:
         imported = ImportedTypes()
         imported.check_type.import_from_globals(_get_caller_globals())
@@ -90,6 +90,7 @@ def strict_mock(spec: Union[Type[Any], Callable, ModuleType],
             for d in dunders.keys():
                 if d in spec_dict:
                     spec_mocked[d] = dunders[d]
+        spec_mocked = get_unsupported_dunders(spec_mocked, spec)
         properties_builder = Properties(spec)
         spec_mocked = properties_builder.add_properties(spec_mocked, properties)
         m = Methods(spec, e_set)

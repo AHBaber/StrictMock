@@ -2,8 +2,7 @@ import pytest
 
 from strict_mock import (Events, Expected, MockContextManagerError, TypeIgnore,
                          ValueIgnore, strict_mock)
-
-from .fake_connection import Connection, Cursor, SimpleDao
+from tests.fakes.fake_connection import Connection, Cursor, SimpleDao
 
 
 def test_context_manager_no_expected_raises_error():
@@ -88,8 +87,6 @@ def test_cm_returns_sub_context_manager():
         Expected("__enter__").returns_mock(),
         Expected("execute", "SELECT * FROM eg.example").returns_mock(),
         Expected("rowcount getter").returns_value(3),
-        Expected("__iter__"),
-        Expected("__iter__"),
         Expected("__next__").returns_value(3),
         Expected("__next__").returns_value(5),
         Expected("__next__").returns_value(8),
@@ -114,18 +111,16 @@ def test_cm_returns_sub_context_manager():
 
 
 def test_cm_values_ignored_returns_sub_context_manager():
-    expected = [3, 5, 8]
+    expected = [5, 8, 13]
     params = dict(a=5, b="something")
     expected_calls_cursor = Events([
         Expected("__enter__").returns_mock(),
         Expected("execute", "SELECT * FROM eg.example WHERE a = %(a)s AND b = %(b)s;",
                  TypeIgnore(params)).returns_mock(),
         Expected("rowcount getter").returns_value(3),
-        Expected("__iter__"),
-        Expected("__iter__"),
-        Expected("__next__").returns_value(3),
         Expected("__next__").returns_value(5),
         Expected("__next__").returns_value(8),
+        Expected("__next__").returns_value(13),
         Expected("__next__").stop_iteration(),
         Expected("__exit__", None, None, None),
     ])

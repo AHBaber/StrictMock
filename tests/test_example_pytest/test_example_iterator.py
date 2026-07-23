@@ -23,8 +23,8 @@ def test_iterator_no_expected_raises_error():
         'Data Length\n'
         '    expected: 0\n'
         '    actual  : 1\n'
-        'Extra          0: Actual("__iter__")\n'
-        '                      fix: Expected("__iter__")\n\n'
+        'Extra          0: Actual("__next__")\n'
+        '                      fix: Expected("__next__")\n\n'
     )
     expected_calls = Events([])
     mock = strict_mock(Iterator, "NoExpected", expected_calls)
@@ -44,13 +44,12 @@ def test_iterator_for_loop_returns_expected_values():
     # a next without a return value will end the loop
     expected = [1, 2, 3]
     expected_calls = Events([
-        Expected("__iter__"),
         Expected("__next__").returns_value(1),
         Expected("__next__").returns_value(2),
         Expected("__next__").returns_value(3),
         Expected("__next__").stop_iteration(),
     ])
-    mock = strict_mock(Iterator, "NoExpected", expected_calls)
+    mock = strict_mock(Iterator, "ForLoop", expected_calls)
     actual = []
     for n in mock:
         actual.append(n)
@@ -64,7 +63,7 @@ def test_iterator_for_loop_with_helper_returns_expected_values():
     # function expected_iter
     expected = [1, 2, 3]
     expected_calls = Events(expected_iter([1, 2, 3]))
-    mock = strict_mock(Iterator, "NoExpected", expected_calls)
+    mock = strict_mock(Iterator, "ForLoop", expected_calls)
     actual = []
     for n in mock:
         actual.append(n)
@@ -79,29 +78,11 @@ def test_iterator_comprehension_returns_expected_values():
     # an additional __iter__ at the beginning
     expected = [1, 2, 3]
     expected_calls = Events([
-        Expected("__iter__"),
-        Expected("__iter__"),
         Expected("__next__").returns_value(1),
         Expected("__next__").returns_value(2),
         Expected("__next__").returns_value(3),
         Expected("__next__").stop_iteration(),
     ])
-    mock = strict_mock(Iterator, "Passes", expected_calls)
-    actual = [n for n in mock]
-
-    assert actual == expected, f"\nexpected: {expected}\nactual  : {actual}"
-    assert mock.assert_all_calls()
-
-
-def test_iterator_comprehension_with_helper_returns_expected_values():
-    # you can use the helper function here as well
-    # you just need to add the extra __iter__
-    # before using expected_iter
-    expected = [1, 2, 3]
-    expected_calls = Events([
-        Expected("__iter__"),
-    ])
-    expected_calls.extend_expected(expected_iter([1, 2, 3]))
     mock = strict_mock(Iterator, "Passes", expected_calls)
     actual = [n for n in mock]
 
@@ -133,8 +114,8 @@ def test_iterator_next_returns_expected_values():
 def test_iterator_next_using_expected_iter_returns_expected_values():
     # using only next() means that we need a value
     # to break the loop
-    expected = [1, 2, 3]
-    expected_calls = Events(expected_iter([1, 2, 3, 4])[1:5])
+    expected = [2, 3]
+    expected_calls = Events(expected_iter([1, 2, 3, 4])[1:4])
     mock = strict_mock(Iterator, "Passes", expected_calls)
     actual = []
     while n := next(mock):
@@ -167,7 +148,6 @@ def test_iterator_next_false_returns_expected_values():
 def test_iterator_iter():
     expected = [1, 2, 3]
     expected_calls = Events([
-        Expected("__iter__"),
         Expected("__next__").returns_value(1),
         Expected("__next__").returns_value(2),
         Expected("__next__").returns_value(3),

@@ -13,6 +13,16 @@ class MockClass:
 
     @classmethod
     def construct(cls, name: str, class_: Type) -> "MockClass":
+        """Build a MockClass from a class, capturing its ``__init__`` signature.
+
+        Args:
+            name: The attribute name the class is exposed under on the module.
+            class_: The class whose instantiation is being mocked.
+
+        Returns:
+            A MockClass carrying the constructor signature (empty if the class
+            defines no ``__init__``).
+        """
         init = vars(class_).get("__init__")
         signature = inspect.Signature() if init is None else inspect.signature(init)
         return cls(name, signature)
@@ -26,6 +36,18 @@ class Classes:
         }
 
     def add_classes(self, spec_mocked: Dict[str, Callable], check_type: CheckType) -> Dict[str, Callable]:
+        """Add a mock constructor for each gathered class to ``spec_mocked``.
+
+        Each entry records instantiation of the class (via the mock module) as an
+        expected event.
+
+        Args:
+            spec_mocked: The mapping of mocked members being assembled.
+            check_type: The type checker used to validate constructor arguments.
+
+        Returns:
+            The updated ``spec_mocked`` mapping.
+        """
         for name, mm in self._classes.items():
             spec_mocked[name] = self._create_mock_class(mm, check_type)
         return spec_mocked

@@ -1,6 +1,5 @@
 from strict_mock import Events, Expected, ValueIgnore, strict_mock
-
-from .test_implementations.fake_mock import FakeMock
+from tests.test_implementations.fake_mock import FakeMock
 
 
 def test_method_equal_returns_expected_value():

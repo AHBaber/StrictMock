@@ -6,3 +6,5 @@ __pycache__
 build
 scratch*
 dist
+dist-old
+Release.md

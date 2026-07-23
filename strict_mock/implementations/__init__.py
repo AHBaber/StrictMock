@@ -10,7 +10,9 @@ from .iterator import expected_iter, iter_dunders
 from .methods import Methods
 from .properties import Prop, Properties
 from .registry import (MockData, assert_no_leaked_mocks, clear_mocks,
-                       get_unasserted_mocks, register_mock)
+                       get_unasserted_mocks, register_mock,
+                       set_externally_managed)
+from .skip import get_unsupported_dunders
 
 __all__ = [
     "BaseMock",
@@ -31,6 +33,8 @@ __all__ = [
     "get_call_dunder",
     "get_spec_dict",
     "get_unasserted_mocks",
+    "get_unsupported_dunders",
     "iter_dunders",
     "register_mock",
+    "set_externally_managed",
 ]

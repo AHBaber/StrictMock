@@ -5,9 +5,7 @@ from ..analysis.errors import MockIteratorError
 
 
 def _iter(mock) -> Any:
-    mock._events._set_error_type(MockIteratorError)
-    td = TypeData("__iter__", mock._check_type, p=ParamIgnore("self"))
-    mock._events.add_actual(mock, "__iter__", td)
+    # simply returns the mock itself
     return mock
 
 
@@ -34,8 +32,7 @@ def expected_iter(data: List[Any]) -> List[Expected]:
 
         mock = strict_mock(MyIterable, events=Events(expected_iter([1, 2, 3])))
     """
-    e = [Expected("__iter__")]
-    e += [Expected("__next__").returns_value(d) for d in data]
+    e = [Expected("__next__").returns_value(d) for d in data]
     return e + [Expected("__next__").stop_iteration()]
 
 

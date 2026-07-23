@@ -43,8 +43,11 @@ class MockContextManagerError(MockError):
     pass
 
 
-# Raised when a mock is created and an error occurs
-class MockCreationError(MockError):
+# Raised when a mock is created and an error occurs.
+# Also an AttributeError so that failed attribute lookups on a mock
+# cooperate with hasattr/getattr-with-default introspection
+# (e.g. inspect.iscoroutinefunction probing the mock).
+class MockCreationError(MockError, AttributeError):
     pass
 
 

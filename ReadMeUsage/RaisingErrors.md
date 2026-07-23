@@ -13,4 +13,5 @@ there is mismatch, then it must rectified before the call to .raises_error() wil
 
 ### Examples
 
-[tests/test_example_functions.py](../tests/test_example_functions.py)
+* [UnitTest Example](../tests/test_example_python_unittest/test_example_functions.py)
+* [PyTest Example](../tests/test_example_pytest/test_example_functions.py)
