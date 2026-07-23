@@ -2,10 +2,9 @@ from typing import Any, Callable, List, Optional
 
 import pytest
 
-from strict_mock import (Events, Expected, MockCreationError, TypeData,
-                         TypeIgnore, expected_iter)
-from strict_mock.analysis import CheckType, get_params
-from strict_mock.implementations import BaseMock
+from strict_mock.analysis import (CheckType, Expected, MockCreationError,
+                                  TypeData, TypeIgnore, get_params)
+from strict_mock.implementations import BaseMock, Events
 
 from .fake_mock import FakeMock
 
@@ -28,32 +27,6 @@ def test_events_none_returns_true():
     assert events._assert_all_calls(make_mock("NoEvents"))
 
 
-def test_events_extend_expected_returns_expected_value():
-    expected: List[Expected] = [
-        Expected("__iter__"),
-        Expected("__next__").returns_value(1),
-        Expected("__next__").returns_value(2),
-        Expected("__next__").returns_value(3),
-        Expected("__next__").stop_iteration(),
-    ]
-
-    events = Events()
-    events.extend_expected(expected_iter([1, 2, 3]))
-    actual = events._expected
-
-    assert len(actual) == len(expected)
-    for i in range(len(expected)):
-        e = expected[i].as_str()
-        a = actual[i].as_str()
-        assert a == e, f"\nindex   : {i}\nexpected: {e}\nactual  : {a}"
-        e = repr(expected[i]._return_value)
-        a = repr(actual[i]._return_value)
-        assert a == e, f"\nindex   : {i}\nexpected: {e}\nactual  : {a}"
-        e = repr(expected[i]._error)
-        a = repr(actual[i]._error)
-        assert a == e, f"\nindex   : {i}\nexpected: {e}\nactual  : {a}"
-
-
 def call0():
     pass
 
@@ -72,10 +45,11 @@ class EventsAddActualBase:
 
     _actual_rv: List[Any] = list()
     _actual_ex: Optional[str] = None
-    _actual_assert: bool
 
     @classmethod
     def setup_class(cls):
+        cls._actual_rv = []
+        cls._actual_ex = None
         events = Events(cls.expected_calls)
         mock = make_mock(cls.name)
         try:
@@ -129,7 +103,7 @@ class TestEventsAddActualNoExpected(EventsAddActualBase):
         '    actual  : 1\n'
         'Extra          0: Actual("call0")\n'
         '                      fix: Expected("call0")\n\n')
-    expected_rv: List[Any] = [None]
+    expected_rv: List[Any] = []
 
     name: str = "EventsNoExpected"
     calls: List[CallClass] = [
@@ -144,7 +118,7 @@ class TestEventsAddActualOnlyExpected(EventsAddActualBase):
         '    expected: 1\n'
         '    actual  : 0\n'
         'Extra          0: Expected("call0")\n\n')
-    expected_rv: List[Any] = [None]
+    expected_rv: List[Any] = []
 
     name: str = "EventNoActual"
     expected_calls: List[Expected] = [
@@ -161,7 +135,7 @@ class TestEventsAddActualMismatch(EventsAddActualBase):
         'Mismatched     0: Expected("call00")\n'
         '                      fix: Expected("call0")\n'
         'Mismatched     0: Actual("call0")\n\n')
-    expected_rv: List[Any] = [None]
+    expected_rv: List[Any] = []
 
     name: str = "EventsMismatch"
     expected_calls: List[Expected] = [
@@ -182,7 +156,7 @@ class TestEventsAddActualIncorrectReturnType(EventsAddActualBase):
         '                      call1r: return_type; expected: int; actual: str("abc")\n'
         '                      fix: Expected("call1r", a: int).returns_value(int)\n'
         '               0: Actual("call1r", 5)\n\n')
-    expected_rv: List[Any] = [None]
+    expected_rv: List[Any] = []
 
     name: str = "EventsIncorrectReturnType"
     expected_calls: List[Expected] = [
@@ -193,8 +167,37 @@ class TestEventsAddActualIncorrectReturnType(EventsAddActualBase):
     ]
 
 
+class TestEventsAddActualError(EventsAddActualBase):
+    class Unexpected(Expected):
+        def __init__(self, name: str, *args, **kwargs) -> None:
+            super().__init__(name, *args, **kwargs)
+            self._nomenclature = "Unexpected"
+
+        def location(self) -> str:
+            return "file_location:37"
+
+    expected_output = (
+        'StrictMock: UnexpectedEventsError Discrepancies\n'
+        'Data Length\n'
+        '    expected: 1\n'
+        '    actual  : 1\n'
+        'Error          0: Error in Expected: Unexpected where Expected was required\n'
+        '                      incorrect: Unexpected: file_location:37\n'
+        '                      fix: Expected(...)\n'
+        'Error          0: Actual("call1r", 5)\n\n'
+    )
+    expected_rv: List[Any] = []
+    name: str = "UnexpectedEventsError"
+    expected_calls: List[Expected] = [
+        Unexpected("something went wrong", "fix: somthing to do", None, None),
+    ]
+    calls: List[CallClass] = [
+        CallClass("call1r", call1r, 5),
+    ]
+
+
 def test_events_raises_error():
-    expected = """hold my drink"""
+    expected = "hold my drink"
     expected_calls = [
         Expected("called1", 1).raises_error(Exception("hold my drink")),
     ]

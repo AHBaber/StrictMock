@@ -1,23 +1,11 @@
 Metadata-Version: 2.4
 Name: StrictMock
-Version: 0.5.0
+Version: 0.6.3
 Summary: Highly Deterministic Mocking
-License: Copyright 2019 Adin H. Baber
-        
-        Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-        
-        1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-        
-        2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-        
-        3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-        
-        THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-        
+License-Expression: BSD-3-Clause
 Keywords: mock,unittest
 Description-Content-Type: text/markdown
 License-File: LICENSE
-Requires-Dist: pytest
 Provides-Extra: testing
 Requires-Dist: pytest; extra == "testing"
 Dynamic: license-file
@@ -90,11 +78,18 @@ giving you suggestions on how to fix the missing Expected events.
 
 ## Installing
 
-Once it is officially released.
+pip install StrictMock
 
 ## Using the StrictMock
 
-Concepts and usage are further explored in [ReadMeUsage](ReadMeUsage)
+Concepts and usage are further explored in [ReadMeUsage](https://github.com/AHBaber/StrictMock/tree/main/ReadMeUsage)
+
+Example files are also provided. These are all unit tests that also provide usage documentation. Each of these files has
+the prefix "test_example". Furthermore, some of these files have the suffix "_errors". These files show common errors
+that may occur while creating the StrictMock.
+
+[UnitTest Examples](https://github.com/AHBaber/StrictMock/tree/main/tests/tests_example_python_unittest)
+[PyTest Examples](https://github.com/AHBaber/StrictMock/tree/main/tests/tests_example_pytest)
 
 # Set Up Local Development Environment
 
@@ -134,3 +129,9 @@ pytest --cov=strict_mock tests --cov-report term-missing
 ```
 stubgen -p strict_mock -o .
 ```
+
+## Versions
+### 0.5.0 
+   Initial Release
+### 0.5.1
+   Removed requirement for pytest

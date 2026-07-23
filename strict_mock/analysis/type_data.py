@@ -76,7 +76,7 @@ class TypeData:
         self._no_fix = True
         return self
 
-    def as_fix_method(self) -> str:
+    def as_fix_method(self, prefix: str = "Expected", postfix: str = "") -> str:
         """Append and return a suggested ``Expected(...)`` fix string for the current call.
 
         Returns an empty string and does nothing when ``no_fix()`` has been called.
@@ -85,7 +85,7 @@ class TypeData:
         """
         if self._no_fix:
             return ""
-        fix = self._params.as_fix_method(self.name)
+        fix = self._params.as_fix_method(self.name, prefix, postfix)
         self.errors.append(fix)
         return fix
 
@@ -156,7 +156,7 @@ class TypeData:
         self.results = ParamList(results)
         return has_errors
 
-    def check_return_value(self, rv: Any) -> bool:
+    def check_return_value(self, rv: Any, prefix: Optional[str] = None, postfix: str = "") -> bool:
         """Validate the return value against the spec's return-type annotation.
 
         ``TypeIgnore`` values bypass this check. If the return type is unspecified
@@ -164,6 +164,8 @@ class TypeData:
 
         Args:
             rv: The value that was returned (or is about to be returned) by the mock.
+            prefix: Optional text to prepend to the return value.
+            postfix: Optional text to append to the return value.
 
         Returns:
             ``True`` if a type error was found, ``False`` otherwise.
@@ -176,6 +178,6 @@ class TypeData:
                 e = type_name(self._params.return_type.type)
                 a = f"{type(rv).__name__}({stringify(rv)})"
                 errors.append(f"{self.name}: return_type; expected: {e}; actual: {a}")
-                errors.append(self._params.as_fix_method(self.name))
+                errors.append(self._params.as_fix_method(self.name, prefix, postfix))
         self.errors.extend(errors)
         return len(errors) > 0

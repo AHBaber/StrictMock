@@ -1,7 +1,9 @@
 from _typeshed import Incomplete
 from typing import Any
 
-class _ValueIgnore: ...
+class _ValueIgnore:
+    def __deepcopy__(self, memo: Any) -> _ValueIgnore: ...
+    def __copy__(self) -> _ValueIgnore: ...
 
 ValueIgnore: Incomplete
 

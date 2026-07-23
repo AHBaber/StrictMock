@@ -17,6 +17,15 @@ class _ValueIgnore:
     def __repr__(self) -> str:
         return "ValueIgnore"
 
+    def __deepcopy__(self, memo: Any) -> "_ValueIgnore":
+        # ValueIgnore is a singleton sentinel that is compared by identity
+        # (``arg is ValueIgnore``). Returning self keeps that identity intact
+        # when an Expected is deep-copied, e.g. inside AsyncGroup.
+        return self
+
+    def __copy__(self) -> "_ValueIgnore":
+        return self
+
 
 ValueIgnore = _ValueIgnore()
 
@@ -75,12 +84,19 @@ class IValueEqual:
 
 
 def stringify(value: Any) -> str:
+    """Render a value as Python source, wrapping strings in double quotes."""
     if type(value) is str:
         return f'"{value}"'
     return str(value)
 
 
 def type_name(t: Any) -> str:
+    """Render a type (or type string) as readable source text.
+
+    Handles ``None``, string annotations, and parameterized generics such as
+    ``Optional[...]``, ``Callable[...]``, and other subscripted types, recursing
+    into their type arguments.
+    """
     if t is type(None) or t is None:
         return "None"
     if type(t) is str:
@@ -115,6 +131,10 @@ _prefixes = {
 
 
 def name_with_prefix(name: str, kind: Any) -> str:
+    """Prefix a parameter name with ``*`` or ``**`` according to its kind.
+
+    ``self`` is returned unchanged.
+    """
     if name == "self":
         return "self"
     p = _prefixes.get(kind, "")

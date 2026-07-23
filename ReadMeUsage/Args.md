@@ -21,7 +21,8 @@ and the values must be rectified.
 
 ### Examples
 
-[tests/test_example_args.py](../tests/test_example_args.py)
+* [UnitTest Example](../tests/test_example_python_unittest/test_example_args.py)
+* [PyTest Example](../tests/test_example_pytest/test_example_args.py)
 
 ### Defaults
 
@@ -46,7 +47,7 @@ strict, passing in a Dict would result in an error. This can be overridden by us
 class Cursor:
     def execute(query: str, params: Optional[Sequence])
         ...
-        
+
 ```
 
 We can wrap the expected value in TypeIgnore, In which case, the values from the actual call must still match the value
@@ -56,8 +57,6 @@ in the Expected(), but the type returned from examining the function signature w
 query = "..."
 Expected("execute", query, TypeIgnore(dict(a=1)))
 ```
-
-Example: [tests/test_example_args.py](../tests/test_example_args.py)
 
 ### ValueIgnore
 
@@ -70,7 +69,10 @@ may used when dealing with any expected event, doing so must be done with extrem
 bypassing one of the major reasons for using a StrictMock in the first place. See Context Managers for a more specific
 example.
 
-Example: [tests/test_example_equality.py](../tests/test_example_equality.py)
+Example:
+
+* [UnitTest Example](../tests/test_example_python_unittest/test_example_equality.py)
+* [PyTest Example](../tests/test_example_pytest/test_example_equality.py)
 
 ### IValueEqual
 
@@ -85,7 +87,10 @@ Albeit, this workaround should be viewed as a significant code smell.
 To use IValueEqual, we need to override the __init__() and __eq__() methods so that we can create an object that may be
 used to test. Optionally, we can override __repr__() to provide more details in the event a test is failing.
 
-Example: [tests/test_example_i_value_equal.py](../tests/test_example_i_value_equal.py)
+Example:
+
+* [UnitTest Example](../tests/test_example_python_unittest/test_example_i_value_equal.py)
+* [PyTest Example](../tests/test_example_pytest/test_example_i_value_equal.py)
 
 ### ImportedTypes
 
@@ -107,4 +112,7 @@ types. For example, I have seen ```Optional[Sequence]``` be given a type string 
 
 See test_example_context_manager for a more specific example.
 
-Example: [tests/test_example_context_manager.py](../tests/test_example_context_manager.py)
+Example:
+
+* [UnitTest Example](../tests/test_example_python_unittest/test_example_context_manager.py)
+* [PyTest Example](../tests/test_example_pytest/test_example_context_manager.py)

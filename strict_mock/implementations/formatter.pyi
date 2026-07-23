@@ -1,12 +1,13 @@
 import abc
 from abc import ABC, abstractmethod
 from enum import Enum
-from strict_mock.analysis import Actual as Actual, Expected as Expected, TypeData as TypeData
+from strict_mock.analysis import Actual as Actual, ErrorExpected as ErrorExpected, Expected as Expected, TypeData as TypeData
 
 class Status(Enum):
-    Correct = '           '
-    Extra = 'Extra      '
+    Correct = ' '
+    Extra = 'Extra '
     Mismatched = 'Mismatched '
+    Error = 'Error '
 
 class IReportFormatter(ABC, metaclass=abc.ABCMeta):
     @abstractmethod

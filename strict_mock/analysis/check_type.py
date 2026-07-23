@@ -65,6 +65,20 @@ class CheckType:
         return name, name
 
     def import_type(self, *types: Any) -> "CheckType":
+        """Register one or more types so they can be resolved from string annotations.
+
+        Each type is stored under both its qualified ``module.name`` and its bare
+        ``name`` so that a string annotation using either form can be evaluated.
+
+        Args:
+            types: The types to register.
+
+        Returns:
+            self, to allow chaining.
+
+        Raises:
+            MockTypeError: If a qualified name is registered more than once.
+        """
         for t in types:
             qual_name, name = self._qualified_name(t)
             if name:
@@ -77,6 +91,18 @@ class CheckType:
         return self
 
     def import_from_globals(self, globals_dict: dict) -> "CheckType":
+        """Register every class found in a globals mapping.
+
+        Used to auto-load the types visible where a mock is created so that string
+        annotations can be resolved without the caller listing them explicitly.
+        Non-class values are ignored and existing registrations are not overwritten.
+
+        Args:
+            globals_dict: A module-style namespace, e.g. the caller's ``globals()``.
+
+        Returns:
+            self, to allow chaining.
+        """
         for v in globals_dict.values():
             if not isinstance(v, type):
                 continue

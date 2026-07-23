@@ -2,13 +2,18 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import List, Optional
 
-from strict_mock.analysis import Actual, Expected, TypeData
+from strict_mock.analysis import Actual, ErrorExpected, Expected, TypeData
 
 
 class Status(Enum):
-    Correct = "           "  # noqa: E222
-    Extra = "Extra      "  # noqa: E222
+    Correct = " "
+    Extra = "Extra "
     Mismatched = "Mismatched "
+    Error = "Error "
+
+
+def _indent(status: Status, index: int) -> str:
+    return f"{status.value:<11} {index:>4}: "
 
 
 class IReportFormatter(ABC):
@@ -56,7 +61,7 @@ class DefaultFormatter(IReportFormatter):
 
         Paired calls that share the same index are compared and labelled
         ``Correct`` or ``Mismatched``. Calls that appear in only one list are
-        labelled ``Extra``. Type-check errors from ``TypeData`` are indented
+        labeled ``Extra``. Type-check errors from ``TypeData`` are indented
         beneath the relevant entry.
 
         Args:
@@ -71,23 +76,28 @@ class DefaultFormatter(IReportFormatter):
         """
         _expected: List[str] = []
         _actual: List[str] = []
+        # no AsyncGroup will be in the intersect section
+        # as this covers everything that was tested with Expected.compare(Actual)
         intersect = min(len(expected), len(actual))
         for i in range(intersect):
             status = Status.Correct
             e = expected[i]
             a = actual[i]
             td = type_data[i]
-            if e.compare_actual(actual[i]):
+            if isinstance(e, ErrorExpected):
+                status = Status.Error
+            elif e.compare_actual(actual[i]):
                 status = Status.Mismatched
-            _expected.append(f"{status.value:<11} {i:>4}: {e.report()}")
+            _expected.append(e.report(_indent(status, i)))
             if td and td.has_errors:
                 _expected.extend([f"                      {tde}" for tde in td.errors])
-            _actual.append(f"{status.value:<11} {i:>4}: {a.report()}")
+            _actual.append(a.report(_indent(status, i)))
         status = Status.Extra
+        # this is safe, since anything in expected is Expected or derived from Expected
         for i in range(intersect, len(expected)):
-            _expected.append(f"{status.value:<11} {i:>4}: {expected[i].report()}")
+            _expected.append(expected[i].report(_indent(status, i)))
         for i in range(intersect, len(actual)):
-            _actual.append(f"{status.value:<11} {i:>4}: {actual[i].report()}")
+            _actual.append(actual[i].report(_indent(status, i)))
             td = type_data[i]
             if td and td.has_errors:
                 _actual.extend([f"                      {tde}" for tde in td.errors])

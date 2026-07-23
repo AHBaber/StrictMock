@@ -1,7 +1,7 @@
 from .actual import Actual
 from .check_type import CheckType, Empty, ImportedTypes
 from .errors import *  # noqa: F403
-from .expected import Expected
+from .expected import ErrorExpected, Expected
 from .param import Param, ParamDefault, ParamExtra, ParamIgnore, ParamValue
 from .param_list import ParamList, get_params
 from .type_data import TypeData
@@ -11,6 +11,7 @@ __all__ = [
     "Actual",
     "CheckType",
     "Empty",
+    "ErrorExpected",
     "Expected",
     "IValueEqual",
     "ImportedTypes",

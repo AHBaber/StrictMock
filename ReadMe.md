@@ -66,11 +66,18 @@ giving you suggestions on how to fix the missing Expected events.
 
 ## Installing
 
-Once it is officially released.
+pip install StrictMock
 
 ## Using the StrictMock
 
-Concepts and usage are further explored in [ReadMeUsage](ReadMeUsage)
+Concepts and usage are further explored in [ReadMeUsage](https://github.com/AHBaber/StrictMock/tree/main/ReadMeUsage)
+
+Example files are also provided. These are all unit tests that also provide usage documentation. Each of these files has
+the prefix "test_example". Furthermore, some of these files have the suffix "_errors". These files show common errors
+that may occur while creating the StrictMock.
+
+[UnitTest Examples](https://github.com/AHBaber/StrictMock/tree/main/tests/tests_example_python_unittest)
+[PyTest Examples](https://github.com/AHBaber/StrictMock/tree/main/tests/tests_example_pytest)
 
 # Set Up Local Development Environment
 
@@ -110,3 +117,9 @@ pytest --cov=strict_mock tests --cov-report term-missing
 ```
 stubgen -p strict_mock -o .
 ```
+
+## Versions
+### 0.5.0 
+   Initial Release
+### 0.6.3
+   Removed requirement for pytest

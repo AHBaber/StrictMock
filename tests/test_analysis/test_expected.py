@@ -2,7 +2,9 @@ from typing import Optional
 
 import pytest
 
-from strict_mock.analysis import Actual, Expected, TypeIgnore, ValueIgnore
+from strict_mock import MockCreationError
+from strict_mock.analysis import (Actual, ErrorExpected, Expected, TypeIgnore,
+                                  ValueIgnore)
 
 
 @pytest.mark.parametrize("expected, value", [
@@ -23,6 +25,37 @@ def test_expected_as_str_returns_expected_value(expected, value):
     actual = value.as_str()
 
     assert actual == expected, f"\nexpected: {expected}\nactual  : {actual}"
+
+
+@pytest.mark.parametrize("expected, left, right", [
+    (True, Expected("pass"), Expected("pass")),
+    (True, Expected("pass", 1, a=2), Expected("pass", 1, a=2)),
+    (True, Expected("pass", ValueIgnore, a=2), Expected("pass", 1, a=2)),
+    (True, Expected("pass", 1, a=2), Expected("pass", ValueIgnore, a=2)),
+    (True, Expected("pass", a=ValueIgnore), Expected("pass", a=1)),
+    (True, Expected("pass", a=1), Expected("pass", a=ValueIgnore)),
+    (True, Expected("returns_pass").returns_value(5), Expected("returns_pass").returns_value(5)),
+    (True, Expected("raises_pass").raises_error(Exception("oops")),
+     Expected("raises_pass").raises_error(Exception("oops"))),
+    (False, Expected("not correct type"), object()),
+    (False, Expected("one name"), Expected("another name")),
+    (False, Expected("diff len args", 1, 2), Expected("diff len args", 1)),
+    (False, Expected("!= args", 1, 2), Expected("!= args", 1, 3)),
+    (False, Expected("diff len kwargs", a=1, b=2), Expected("diff len kwargs", a=1)),
+    (False, Expected("diff kwargs", a=1, b=2), Expected("diff kwargs", a=1, c=2)),
+    (False, Expected("!= kwargs", a=1), Expected("!= kwargs", a=2)),
+    (False, Expected("returns_ne").returns_value(5), Expected("returns_ne").returns_value(6)),
+    (False, Expected("returns_diff").returns_mock(), Expected("returns_diff").returns_value(6)),
+    (False, Expected("raises_fails").raises_error(Exception("oops")), Expected("raises_fails")),
+    (False, Expected("raises_fails"), Expected("raises_fails").raises_error(Exception("oops"))),
+    (False, Expected("raises_fails").raises_error(TypeError("oops")),
+     Expected("raises_fails").raises_error(ValueError("oops"))),
+    (False, Expected("raises_fails").raises_error(TypeError("oops")),
+     Expected("raises_fails").raises_error(TypeError("typo"))),
+])
+def test_expected_eq_returns_expected_value(expected, left, right):
+    actual = left == right
+    assert actual == expected, f"\nleft : {left}\nright: {right}"
 
 
 def test_expected_get_return_value_returns_none():
@@ -49,9 +82,18 @@ def test_expected_get_return_value_raises_error():
 
 def test_expected_get_return_value_stop_iteration_raises_error():
     expected = ""
-    e = Expected("m").stop_iteration()
+    e = Expected("__next__").stop_iteration()
     with pytest.raises(StopIteration) as ex:
         e._get_return_value()
+    actual = str(ex.value)
+
+    assert actual == expected, f"\nexpected: {expected}\nactual  : {actual}"
+
+
+def test_expected_get_return_value_stop_iteration_incorrect_method_raises_error():
+    expected = '.stop_iteration() may only be used with "__next__", not "oops"'
+    with pytest.raises(MockCreationError) as ex:
+        Expected("oops").stop_iteration()
     actual = str(ex.value)
 
     assert actual == expected, f"\nexpected: {expected}\nactual  : {actual}"
@@ -146,3 +188,26 @@ def test_expected_get_mock_name_returns_expected_value(expected: Optional[str], 
 def test_expected_report_mock_fix_returns_expected_value(expected: Optional[str], e: Expected, mock_name: str):
     actual = e._report_mock_fix(mock_name)
     assert actual == expected, f"\nexpected: {expected}\nactual  : {actual}"
+
+
+def test_error_expected_compare_actual_returns_true():
+    expected = True
+    actual = ErrorExpected("matching", "").compare_actual(Actual("matching"))
+    assert actual == expected, f"\nexpected: {expected}\nactual: {actual}"
+
+
+def test_error_expected_report_returns_basic_text():
+    expected = "Error in Expected: Something Went wrong\n    fix: useful instructions"
+    actual = ErrorExpected("Something Went wrong", "useful instructions").report()
+    assert actual == expected, f"\nexpected: {expected}\nactual: {actual}"
+
+
+def test_error_expected_report_expected_returns_expected_value():
+    expected = (
+        'Error in Expected: E when async was needed\n'
+        '    incorrect: Expected("method", a=5, b=12)\n'
+        '    fix: AsyncGroup(Expected(...))'
+    )
+    e = Expected("method", a=5, b=12)
+    actual = ErrorExpected("E when async was needed", "AsyncGroup(Expected(...))", e).report()
+    assert actual == expected, f"\nexpected: {expected}\nactual: {actual}"

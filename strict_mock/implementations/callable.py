@@ -1,21 +1,32 @@
 import inspect
-from typing import Any, Callable, Dict, Optional, Tuple, Type, Union
+from types import ModuleType
+from typing import Any, Callable, Dict, Type, Union
 
 from ..analysis import MockCallableError, TypeData
 from ..analysis.param_list import get_params_from_signature
 
-# this was made since the formatter keep moving part of the type
-# to a new line, and then flake8 would complain about the indention
-_GCDReturnType = Tuple[Dict[str, Any], Optional[Type[Any]]]
 
+def get_call_dunder(spec_mocked: Dict[str, Any],
+                    spec: Union[Type[Any], Callable, ModuleType]) -> Dict[str, Any]:
+    """Wire up a ``__call__`` mock when the spec is callable.
 
-def get_call_dunder(spec_mocked: Dict[str, Any], spec: Union[Type[Any], Callable]) -> _GCDReturnType:
+    Adds a ``__call__`` entry to ``spec_mocked`` when ``spec`` is a plain function
+    or a class whose instances are callable (it defines ``__call__``). Modules and
+    non-callable classes are left unchanged.
+
+    Args:
+        spec_mocked: The mapping of mocked members being assembled.
+        spec: The class, function, or module being mocked.
+
+    Returns:
+        The updated ``spec_mocked`` mapping.
+    """
     if inspect.isfunction(spec):
         spec_mocked["__call__"] = _call(spec)
-        return spec_mocked, None  # not returned to indicate that it is not a class
-    if inspect.isclass(spec) and issubclass(spec, Callable):  # type: ignore
+        return spec_mocked
+    if inspect.isclass(spec) and any("__call__" in cls.__dict__ for cls in spec.__mro__):
         spec_mocked["__call__"] = _call(getattr(spec, "__call__"))
-    return spec_mocked, spec  # type: ignore
+    return spec_mocked
 
 
 def _call(spec) -> Callable:

@@ -27,21 +27,19 @@ def _create_mock(name: str, expected: List[Expected]):
 
 def test_expected_iter_returns_empty_list():
     expected: List[Expected] = [
-        Expected("__iter__"),
-        Expected("__next__"),
+        Expected("__next__").stop_iteration(),
     ]
     actual = expected_iter([])
 
     assert len(actual) == len(expected)
     for i in range(len(expected)):
-        a = actual[i].as_str()
-        e = expected[i].as_str()
+        a = actual[i]
+        e = expected[i]
         assert a == e, f"\nindex   : {i}\nexpected: {e}\nactual  : {a}"
 
 
 def test_expected_iter_returns_expected_values():
     expected: List[Expected] = [
-        Expected("__iter__"),
         Expected("__next__").returns_value(1),
         Expected("__next__").returns_value(2),
         Expected("__next__").returns_value(3),
@@ -60,8 +58,6 @@ def test_iterator_comprehension_no_values_returns_expected_value():
     expected: List[int] = []
 
     expected_calls: List[Expected] = [
-        Expected("__iter__"),
-        Expected("__iter__"),
         Expected("__next__").stop_iteration(),
     ]
     mock = _create_mock("IteratorPass", expected_calls)
@@ -74,8 +70,7 @@ def test_iterator_comprehension_no_values_returns_expected_value():
 def test_iterator_comprehension_returns_expected_value():
     expected = [1, 2, 3]
 
-    expected_calls: List[Expected] = [Expected("__iter__")]
-    expected_calls += expected_iter([1, 2, 3])
+    expected_calls: List[Expected] = expected_iter([1, 2, 3])
     mock = _create_mock("IteratorPass", expected_calls)
     actual = [n for n in mock]
 
@@ -87,7 +82,6 @@ def test_iterator_for_no_values_returns_expected_value():
     expected: List[int] = []
 
     expected_calls: List[Expected] = [
-        Expected("__iter__"),
         Expected("__next__").stop_iteration(),
     ]
     mock = _create_mock("IteratorPass", expected_calls)
@@ -103,7 +97,6 @@ def test_iterator_for_loop_returns_expected_value():
     expected = [1, 2, 3]
 
     expected_calls: List[Expected] = [
-        Expected("__iter__"),
         Expected("__next__").returns_value(1),
         Expected("__next__").returns_value(2),
         Expected("__next__").returns_value(3),
@@ -161,9 +154,7 @@ def test_iterator_next_three_values_returns_expected_value():
 
 
 def test_iterator_iter_no_values_returns_expected_value():
-    expected_calls: List[Expected] = [
-        Expected("__iter__"),
-    ]
+    expected_calls: List[Expected] = []
     mock = _create_mock("IteratorPass", expected_calls)
     _ = iter(mock)
 
@@ -173,7 +164,6 @@ def test_iterator_iter_no_values_returns_expected_value():
 def test_iterator_iter_1_values_returns_expected_value():
     expected = 5
     expected_calls: List[Expected] = [
-        Expected("__iter__"),
         Expected("__next__").returns_value(5),
     ]
     mock = _create_mock("IteratorPass", expected_calls)

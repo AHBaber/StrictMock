@@ -8,6 +8,7 @@ from typing import Any, Callable
 class MockMethod:
     name: str
     signature: inspect.Signature
+    is_async: bool = ...
     @classmethod
     def construct(cls, name: str, method: Callable) -> MockMethod: ...
 

@@ -19,11 +19,20 @@ thus any subsequence calls will cause an error to be raised.
 
 ### Examples
 
-[tests/test_example_properties_decorator.py](../tests/test_example_properties_decorator.py)
+Decorator
 
-[tests/test_example_properties_class.py](../tests/test_example_properties_class.py)
+* [UnitTest Example](../tests/test_example_python_unittest/test_example_properties_decorator.py)
+* [PyTest Example](../tests/test_example_pytest/test_example_properties_decorator.py)
 
-[tests/test_example_properties_artificial.py](../tests/test_example_properties_artificial.py)
+Class Type Annotations
+
+* [UnitTest Example](../tests/test_example_python_unittest/test_example_properties_class.py)
+* [PyTest Example](../tests/test_example_pytest/test_example_properties_class.py)
+
+Artificial
+
+* [UnitTest Example](../tests/test_example_python_unittest/test_example_properties_artificial.py)
+* [PyTest Example](../tests/test_example_pytest/test_example_properties_artificial.py)
 
 ### Decorator Properties
 
@@ -43,7 +52,7 @@ class ClassWithProperty:
     prop: str  # will be mocked
 
     def __init__(self):
-        self.later = ...   # will NOT be mocked 
+        self.later = ...   # will NOT be mocked
 ```
 
 ### Artificial Properties

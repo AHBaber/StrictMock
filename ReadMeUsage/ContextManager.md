@@ -14,7 +14,8 @@ expected_calls = Events([
 
 ### Examples
 
-[tests/test_example_context_manager.py](../tests/test_example_context_manager.py)
+* [UnitTest Example](../tests/test_example_python_unittest/test_example_context_manager.py)
+* [PyTest Example](../tests/test_example_pytest/test_example_context_manager.py)
 
 ### Nesting Contexts
 

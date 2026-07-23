@@ -9,6 +9,7 @@ _ip = inspect.Parameter
 
 
 def get_default_kind():
+    """Return the default parameter kind (``POSITIONAL_OR_KEYWORD``)."""
     return inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
@@ -24,14 +25,17 @@ class Param:
 
     @property
     def is_positional(self) -> bool:
+        """Whether this parameter can be passed positionally (includes ``*args``)."""
         return self.kind in (_ip.POSITIONAL_OR_KEYWORD, _ip.POSITIONAL_ONLY, _ip.VAR_POSITIONAL)
 
     @property
     def is_keyword(self) -> bool:
+        """Whether this parameter can be passed by keyword (includes ``**kwargs``)."""
         return self.kind in (_ip.POSITIONAL_OR_KEYWORD, _ip.KEYWORD_ONLY, _ip.VAR_KEYWORD)
 
     @property
     def is_variadic(self) -> bool:
+        """Whether this parameter is variadic (``*args`` or ``**kwargs``)."""
         return self.kind in (_ip.VAR_POSITIONAL, _ip.VAR_KEYWORD)
 
     def __repr__(self) -> str:
@@ -61,6 +65,7 @@ class Param:
         return True
 
     def as_param(self) -> str:
+        """Render this parameter as it would appear in a signature (``name: type = default``)."""
         # returns a string as though it was a parameter in a function
         if self.name == "self":
             return "self"
@@ -75,6 +80,7 @@ class ParamValue(Param):
     value: Any = _empty
 
     def as_param(self) -> str:
+        """Render this parameter as a call argument (``name=value`` or a bare value)."""
         if self.name != _empty:
             return f"{self.name}={stringify(self.value)}"
         return stringify(self.value)
@@ -85,6 +91,7 @@ class ParamExtra(Param):
     extra: Any = _empty
 
     def as_param(self) -> str:
+        """Render this parameter as an ``extra`` argument annotated with its runtime type."""
         n = f"{self.name}=" if self.name != _empty else ""
         return f"extra: {n}{type_name(type(self.extra))}({stringify(self.extra)})"
 
@@ -92,6 +99,7 @@ class ParamExtra(Param):
 @dataclass
 class ParamDefault(Param):
     def as_param(self) -> str:
+        """Render this parameter as a signature entry that always shows its default value."""
         return f"{self.name}: {type_name(self.type)} = {stringify(self.default)}"
 
 
@@ -100,6 +108,7 @@ class ParamIgnore(Param):
         super().__init__(name, Any)
 
     def as_param(self) -> str:
+        """Render as ``ValueIgnore``, the placeholder for an ignored argument."""
         return "ValueIgnore"
 
     def __repr__(self):

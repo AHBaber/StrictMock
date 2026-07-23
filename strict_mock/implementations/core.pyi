@@ -5,7 +5,7 @@ from strict_mock.analysis import ImportedTypes as ImportedTypes, MockCreationErr
 from types import ModuleType
 from typing import Any, Callable
 
-class BaseMock:
+class BaseMock(_MockBase):
     def __init__(self, spec: type[Any], name: str, events: Events, imported: ImportedTypes | None = None) -> None: ...
     @property
     def __class__(self) -> Any: ...
