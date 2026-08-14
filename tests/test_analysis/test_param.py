@@ -80,6 +80,7 @@ def test_param_repr_returns_expected_value(expected: str, p: Param):
     ('o: Optional', Param("o", Optional)),
     ('seq: Sequence', Param("seq", Sequence)),
     ('u: Union', Param("u", Union)),
+    ('u: Union[str, int]', Param("u", Union[str, int])),
 ])
 def test_param_as_param_returns_expected_value(expected: str, p: Param):
     actual = p.as_param()
@@ -116,10 +117,11 @@ def test_param_eq_returns_expected_value(expected, p1, p2):
     actual = p1 == p2
     assert actual == expected, f"\nexpected: {expected}\nactual  : {actual}"
 
-# @pytest.mark.parametrize("expected, p1, p2", [
-#     (True, ParamIgnore("a"), Param("a", int)),
-#     (False, ParamIgnore("a"), "not a param"),
-# ])
-# def test_param_ignore_eq_returns_expected_value(expected, p1, p2):
-#     actual = p1 == p2
-#     assert actual == expected, f"\nexpected: {expected}\nactual  : {actual}"
+
+@pytest.mark.parametrize("expected, p1, p2", [
+    (True, ParamIgnore("a"), Param("a", int)),
+    (False, ParamIgnore("a"), "not a param"),
+])
+def test_param_ignore_eq_returns_expected_value(expected, p1, p2):
+    actual = p1 == p2
+    assert actual == expected, f"\nexpected: {expected}\nactual  : {actual}"

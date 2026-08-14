@@ -51,6 +51,8 @@ def test_stringify(input, expected):
     (Optional[bool], "Optional[bool]"),
     (Tuple[int, Dict[str, int]], "Tuple[int, Dict[str, int]]"),
     (Union[int, str, List[int]], "Union[int, str, List[int]]"),
+    (Union[None, int], "Optional[int]"),
+    (Union[int, None], "Optional[int]"),
     ("str", '"str"'),
 ])
 def test_type_name(input, expected):

@@ -1,5 +1,18 @@
 # StrictMock
 
+## Installing
+
+pip install StrictMock
+
+## Supported Versions
+
+Python 3.11 unittest
+Python 3.12 unittest
+Python 3.13 unittest
+Python 3.14 unittest
+
+Pytest 8.4.2 or greater
+
 ## Design Concepts and Goals
 
 Mocking a useful and standard tool for building unit tests. However, I have found a few frustrations with using them.
@@ -50,23 +63,17 @@ giving you suggestions on how to fix the missing Expected events.
 
 ## Limitations
 
-1) Since the StrictMock addresses all events in a specific order, it may only be used for synchronous testing.
-2) Properties created with decorators don't have type info, thus strict_mock will default to a type of Any. This can be
+1) Properties created with decorators don't have type info, thus strict_mock will default to a type of Any. This can be
    worked around by using Artificial Properties.
-3) Attributes that become assigned to an instance after it is initialized will not automatically be created. This is due
+2) Attributes that become assigned to an instance after it is initialized will not automatically be created. This is due
    to the fact that they do not exist as part of the class. Once again, Artificial Properties provide a solution.
-4) There is an expectation that __eq__ is correctly implemented for all types being used for args in the tests. In the
+3) There is an expectation that __eq__ is correctly implemented for all types being used for args in the tests. In the
    event a type does not implement __eq__ correctly, then you may use IValueEqual as a work around.
-5) Modules global instances are not directly supported.
-6) Module Constants should not be mocked. They are constants after all.
-7) There is not a patch feature.  (Note: I am strongly biased towards dependency injection anyway).
-8) Async is not officially supported as of yet.
-9) Threading is not officially supported as of yet.
-10) Importing classes with the same name from different modules may cause problems.
-
-## Installing
-
-pip install StrictMock
+4) Modules global instances are not directly supported.
+5) Module Constants should not be mocked. They are constants after all.
+6) There is not a patch feature.  (Note: I am strongly biased towards dependency injection anyway).
+7) Threading is not officially supported as of yet.
+8) Importing classes with the same name from different modules may cause problems.
 
 ## Using the StrictMock
 
@@ -76,8 +83,8 @@ Example files are also provided. These are all unit tests that also provide usag
 the prefix "test_example". Furthermore, some of these files have the suffix "_errors". These files show common errors
 that may occur while creating the StrictMock.
 
-[UnitTest Examples](https://github.com/AHBaber/StrictMock/tree/main/tests/tests_example_python_unittest)
-[PyTest Examples](https://github.com/AHBaber/StrictMock/tree/main/tests/tests_example_pytest)
+* [UnitTest Examples](https://github.com/AHBaber/StrictMock/tree/main/tests/test_example_python_unittest)
+* [PyTest Examples](https://github.com/AHBaber/StrictMock/tree/main/tests/test_example_pytest)
 
 # Set Up Local Development Environment
 
@@ -119,7 +126,15 @@ stubgen -p strict_mock -o .
 ```
 
 ## Versions
-### 0.5.0 
-   Initial Release
-### 0.5.1
-   Removed requirement for pytest
+
+### 0.5.0
+
+Initial Release
+
+### 0.6.3
+
+Removed requirement for pytest
+
+### 0.6.5
+
+Verified support for 3.11 - 3.14

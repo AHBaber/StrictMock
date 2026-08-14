@@ -13,7 +13,15 @@ class MockClass:
 
     @classmethod
     def construct(cls, name: str, class_: Type) -> "MockClass":
-        """Build a MockClass from a class, capturing its ``__init__`` signature.
+        """Build a MockClass from a class, capturing its constructor signature.
+
+        The signature is taken from the class itself rather than from its own
+        ``__init__``: a class may inherit its ``__init__`` or build instances in
+        ``__new__``, and pathlib.Path does both depending on the Python version.
+        Note that a class signature carries no ``self`` parameter.
+
+        The return annotation is dropped: instantiation yields an instance, not
+        whatever ``__init__`` is annotated to return (usually None).
 
         Args:
             name: The attribute name the class is exposed under on the module.
@@ -21,11 +29,13 @@ class MockClass:
 
         Returns:
             A MockClass carrying the constructor signature (empty if the class
-            defines no ``__init__``).
+            takes no arguments or cannot be introspected).
         """
-        init = vars(class_).get("__init__")
-        signature = inspect.Signature() if init is None else inspect.signature(init)
-        return cls(name, signature)
+        try:
+            signature = inspect.signature(class_)
+        except (TypeError, ValueError):
+            signature = inspect.Signature()
+        return cls(name, signature.replace(return_annotation=inspect.Signature.empty))
 
 
 class Classes:
