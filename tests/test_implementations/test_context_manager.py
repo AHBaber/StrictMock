@@ -1,3 +1,4 @@
+import sys
 from typing import Any, Callable, Dict, List, Type
 
 import pytest
@@ -35,6 +36,9 @@ def _create_mock(spec: Type[Any], name: str, expected: List[Expected]):
 
 def test_context_manager_spec_not_callable_raises_error():
     expected = "'StrictMockTesting:NotCM' object does not support the context manager protocol"
+    if sys.version.startswith("3.14"):
+        expected = ("'tests.test_implementations.test_context_manager.StrictMockTesting:NotCM' object does "
+                    "not support the context manager protocol (missed __exit__ method)")
 
     mock = _create_mock(FakeMock, "NotCM", [])
 

@@ -1,3 +1,4 @@
+import sys
 from copy import copy
 
 import pytest
@@ -102,6 +103,9 @@ def test_no_cm_raises_error():
         pass
 
     expected = "'StrictMockNotCM' object does not support the context manager protocol"
+    if sys.version.startswith("3.14"):
+        expected = ("'strict_mock.strict_mock.StrictMockNotCM' object does not "
+                    "support the context manager protocol (missed __exit__ method)")
     mock = strict_mock(NotCM)
     with pytest.raises(TypeError) as ex:
         with mock:

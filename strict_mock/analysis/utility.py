@@ -1,4 +1,5 @@
 import inspect
+import typing
 from typing import Any
 
 
@@ -101,14 +102,18 @@ def type_name(t: Any) -> str:
         return "None"
     if type(t) is str:
         return f'"{t}"'
-    if hasattr(t, '__origin__') and t.__origin__ is not None:
-        base_type = getattr(t, '_name', None) or t.__origin__.__name__
-        if not hasattr(t, '__args__'):
-            return base_type
-        args = t.__args__
 
-        if base_type == "Optional":
-            return f"Optional[{type_name(args[0])}]"
+    origin = typing.get_origin(t)
+    if origin is not None:
+        base_type = getattr(t, '_name', None) or origin.__name__
+        # __args__ (not get_args) keeps Callable's argument list flattened.
+        args = getattr(t, '__args__', None)
+        if not args:
+            return base_type
+
+        if base_type in ("Optional", "Union") and len(args) == 2 and type(None) in args:
+            inner = args[0] if args[1] is type(None) else args[1]
+            return f"Optional[{type_name(inner)}]"
 
         if base_type == "Callable":
             if len(args) > 1:
