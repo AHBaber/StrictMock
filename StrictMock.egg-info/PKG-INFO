@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: StrictMock
-Version: 0.6.5
+Version: 0.6.6
 Summary: Highly Deterministic Mocking
 License-Expression: BSD-3-Clause
 Keywords: mock,unittest
