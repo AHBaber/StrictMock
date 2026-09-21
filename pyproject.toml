@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "StrictMock"
-version = "0.6.5"
+version = "0.6.6"
 requires-python = ">=3.11"
 description = "Highly Deterministic Mocking"
 license = "BSD-3-Clause"
