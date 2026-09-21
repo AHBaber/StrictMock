@@ -142,6 +142,19 @@ class Expected(Actual):
             raise MockCreationError(f'.stop_iteration() may only be used with "__next__", not "{self.name}"')
         return self.raises_error(StopIteration())
 
+    def stop_async_iteration(self) -> "Expected":
+        """Raise StopAsyncIteration when this expected call is matched.
+
+        Convenience wrapper around raises_error(StopAsyncIteration()) intended
+        for use as the terminal entry in an iterator mock.
+
+        Returns:
+            self, to allow chaining.
+        """
+        if self.name != "__anext__":
+            raise MockCreationError(f'.stop_async_iteration() may only be used with "__anext__", not "{self.name}"')
+        return self.raises_error(StopAsyncIteration())
+
     def _get_return_value(self) -> Any:
         # if there is an error, then the error is raised
         # otherwise it will return the value if it is set

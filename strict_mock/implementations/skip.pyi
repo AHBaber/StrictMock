@@ -6,5 +6,6 @@ from typing import Any, Callable
 unsupported: Incomplete
 
 def get_unsupported_dunders(spec_mocked: dict[str, Any], spec: type[Any] | Callable | ModuleType) -> dict[str, Any]: ...
+def _unsupported(name: str) -> Callable: ...
 
 skip: Incomplete

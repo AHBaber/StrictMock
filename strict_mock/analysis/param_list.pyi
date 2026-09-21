@@ -1,11 +1,18 @@
 import inspect
 from .param import Param as Param
 from .utility import name_with_prefix as name_with_prefix, type_name as type_name
+from _typeshed import Incomplete
 from typing import Any
 
+_empty: Incomplete
+
 class ParamList:
+    _params: list[Param]
+    _keys: dict[str, Param]
+    _index: int
     return_type: Param | None
     def __init__(self, params: list[Param] | None = None) -> None: ...
+    def __repr__(self) -> str: ...
     def append(self, param: Param) -> ParamList: ...
     def add_return_type(self, t: Any) -> ParamList: ...
     def as_fix_method(self, name: str, prefix: str | None = None, postfix: str = '') -> str: ...

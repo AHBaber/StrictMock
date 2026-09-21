@@ -9,6 +9,8 @@ class Status(Enum):
     Mismatched = 'Mismatched '
     Error = 'Error '
 
+def _indent(status: Status, index: int) -> str: ...
+
 class IReportFormatter(ABC, metaclass=abc.ABCMeta):
     @abstractmethod
     def report(self, name: str, expected: list[Expected], actual: list[Actual], type_data: list[TypeData | None]) -> str: ...

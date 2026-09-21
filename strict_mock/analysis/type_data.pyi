@@ -5,11 +5,17 @@ from .utility import IValueEqual as IValueEqual, TypeIgnore as TypeIgnore, Value
 from _typeshed import Incomplete
 from typing import Any
 
+_empty: Incomplete
+
 class TypeData:
     name: Incomplete
+    _params: Incomplete
+    _check_type: Incomplete
     errors: list[str]
     results: ParamList
+    _no_fix: bool
     def __init__(self, name: str, check_type: CheckType, pl: ParamList | None = None, p: Param | None = None) -> None: ...
+    def __repr__(self) -> str: ...
     @property
     def has_errors(self) -> bool: ...
     def adjust_params(self, *args, **kwargs) -> None: ...

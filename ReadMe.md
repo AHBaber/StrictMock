@@ -138,3 +138,8 @@ Removed requirement for pytest
 ### 0.6.5
 
 Verified support for 3.11 - 3.14
+
+
+### 0.6.6
+
+Added support for dependent async library
